@@ -96,6 +96,20 @@ test_configuration = load_configuration_template(config_path, test_configuration
 local_internal_options = {configuration.SYSCHECK_DEBUG: 2, AGENTD_DEBUG: 2, MONITORD_ROTATE_LOG: 0}
 if sys.platform == WINDOWS: local_internal_options.update({AGENTD_WINDOWS_DEBUG: 2})
 
+# Invalid UTF-8 sequences
+invalid_sequences = (
+    "\xC0\xAF",  # Overlong encoding of '/'
+    "\xE0\x80\xAF",  # Overlong encoding(null character U + 002F)
+    "\xED\xA0\x80",  # UTF - 16 surrogate half(invalid in UTF - 8)
+    # 5 - byte sequence(invalid, as UTF - 8 only supports up to 4 bytes)
+    "\xF8\x88\x80\x80\x80",
+    "\xFF",  # Invalid single byte(not valid in UTF - 8)
+    "\x80",  # Continuation byte without a start
+    "\xC3\x28"  # Invalid 2 - byte sequence(invalid second byte)
+)
+
+# Test cases
+
 @pytest.mark.parametrize('test_configuration, test_metadata', zip(test_configuration, test_metadata), ids=cases_ids)
 def test_nonUTF8(test_configuration, test_metadata, set_wazuh_configuration, configure_local_internal_options,
                   truncate_monitored_files, folder_to_monitor, daemons_handler, start_monitoring):
@@ -152,7 +166,7 @@ def test_nonUTF8(test_configuration, test_metadata, set_wazuh_configuration, con
     monitor = FileMonitor(WAZUH_LOG_PATH)
 
     # Create
-    test_path = os.path.join(test_metadata['folder_to_monitor'], '§¨©ª«¬-®¯±²³¶¹º»¼½¾testáéíóú')
+    test_path = os.path.join(test_metadata['folder_to_monitor'], str.join('', invalid_sequences))
     file.truncate_file(WAZUH_LOG_PATH)
     if sys.platform == 'win32':
         file.write_file(test_path)
@@ -222,7 +236,8 @@ if sys.platform == WINDOWS:
         monitor = FileMonitor(WAZUH_LOG_PATH)
 
         # Create
-        sub_key = os.path.join(test_metadata['sub_key'], '§¨©ª«¬-®¯±²³¶¹º»¼½¾testáéíóú')
+        sub_key = os.path.join(
+            test_metadata['sub_key'], str.join('', invalid_sequences))
         file.truncate_file(WAZUH_LOG_PATH)
         create_registry(win32con.HKEY_LOCAL_MACHINE, sub_key, KEY_WOW64_64KEY)
         monitor.start(generate_callback(EVENT_TYPE_ADDED))
