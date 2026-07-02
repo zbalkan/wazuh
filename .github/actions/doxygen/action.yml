@@ -2,18 +2,6 @@ name: "Doxygen documentation generartion"
 description: "Generates the documentation for a given module"
 
 inputs:
-  path:
-    required: true
-    description: "Path to the module we want to generate documentation for"
-    default: src/
-  doxygen_config:
-    required: true
-    description: "Path to the doxygen configuration file"
-    default: src/Doxyfile
-  id:
-    required: true
-    description: "Module identifier, used to name the artifact"
-
   aws_region:
     description: "AWS region for S3 (pass the CI_AWS_REGION secret)."
     required: false
@@ -27,6 +15,17 @@ inputs:
     description: "IAM role (OIDC) to assume for S3 access (pass the CI_OIDC_ROLE_ARN secret)."
     required: false
     default: ""
+  path:
+    required: true
+    description: "Path to the module we want to generate documentation for"
+    default: src/
+  doxygen_config:
+    required: true
+    description: "Path to the doxygen configuration file"
+    default: src/Doxyfile
+  id:
+    required: true
+    description: "Module identifier, used to name the artifact"
 
 runs:
   using: "composite"
