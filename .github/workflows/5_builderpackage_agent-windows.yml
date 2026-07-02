@@ -44,6 +44,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 
+# Granted at the workflow level so the reusable smoke-test / integration-test
+# calls (which run S3 uploads/downloads over OIDC) can request id-token.
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   detect-changes:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
