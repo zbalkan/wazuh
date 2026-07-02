@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 - Changed the default Indexer user used by the Manager from `admin` to the restricted `wazuh-server` user, aligning with the Indexer RBAC least-privilege model. ([#36311](https://github.com/wazuh/wazuh/issues/36311))
 - Enabled shared-password agent enrollment by default, persisting the auto-generated `authd.pass` and synchronizing it to worker nodes, with fail-closed password validation. ([#36705](https://github.com/wazuh/wazuh/issues/36705))
 - Adapted API integration tests. ([#32698](https://github.com/wazuh/wazuh/issues/32698))
+- Migrated the remaining CI GitHub Actions artifacts (agent package builders, toolchain, and engine build/test workflows) to the internal S3 bucket, so no workflow uses `actions/upload-artifact`/`download-artifact`. ([#3502](https://github.com/wazuh/wazuh-automation/issues/3502))
 
 #### Removed
 
