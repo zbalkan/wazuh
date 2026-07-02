@@ -2,14 +2,6 @@ name: "Coding style check"
 description: "Validates the Coding style of a given module"
 
 inputs:
-  path:
-    required: true
-    description: "Path to validate"
-    default: src/
-  id:
-    required: true
-    description: "Module identifier, used to name the artifact"
-
   aws_region:
     description: "AWS region for S3 (pass the CI_AWS_REGION secret)."
     required: false
@@ -23,6 +15,13 @@ inputs:
     description: "IAM role (OIDC) to assume for S3 access (pass the CI_OIDC_ROLE_ARN secret)."
     required: false
     default: ""
+  path:
+    required: true
+    description: "Path to validate"
+    default: src/
+  id:
+    required: true
+    description: "Module identifier, used to name the artifact"
 
 runs:
   using: "composite"
