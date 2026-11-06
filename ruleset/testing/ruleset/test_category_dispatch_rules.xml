@@ -16,6 +16,7 @@
     <description>QA baseline: firewall decoder and category agree.</description>
   </rule>
 
+  <!-- This prefix intentionally matches the IDS base and _CHILD fixtures. -->
   <rule id="999942" level="8">
     <category>ids</category>
     <decoded_as>qa_dispatch_ids</decoded_as>
