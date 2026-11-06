@@ -1,0 +1,26 @@
+<!-- Characterization fixtures for category-based dispatch in Wazuh 4.14.10. -->
+<!-- These legacy types are intentional. Remove them only during migration. -->
+
+<decoder name="qa_dispatch_syslog">
+  <type>syslog</type>
+  <program_name>^qa_dispatch_syslog$</program_name>
+</decoder>
+
+<decoder name="qa_dispatch_firewall">
+  <type>firewall</type>
+  <program_name>^qa_dispatch_firewall$</program_name>
+</decoder>
+
+<decoder name="qa_dispatch_ids">
+  <type>ids</type>
+  <program_name>^qa_dispatch_ids$</program_name>
+</decoder>
+
+<!-- A matched program name is committed even when extraction later fails. -->
+<!-- This is a known 4.14.10 defect, characterized rather than corrected here. -->
+<decoder name="qa_dispatch_partial">
+  <type>syslog</type>
+  <program_name>^qa_dispatch_partial$</program_name>
+  <regex>^PARSED ([0-9]+)$</regex>
+  <order>id</order>
+</decoder>
