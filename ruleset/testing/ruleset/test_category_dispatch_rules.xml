@@ -55,6 +55,8 @@
     <description>QA baseline: undecoded event uses syslog category.</description>
   </rule>
 
+  <!-- if_sid inherits the IDS category from parent 999942 in _AddtoRule(). -->
+  <!-- The category is intentionally omitted to characterize inheritance. -->
   <rule id="999947" level="11">
     <if_sid>999942</if_sid>
     <match>^CATEGORY_DISPATCH_IDS_CHILD$</match>
