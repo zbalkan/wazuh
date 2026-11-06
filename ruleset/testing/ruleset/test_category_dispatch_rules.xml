@@ -1,0 +1,71 @@
+<!-- Wazuh 4.14.10 category-dispatch characterization rules. -->
+<!-- Use unique QA IDs; retain these legacy categories until the cutover. -->
+<group name="qa,category_dispatch_baseline,">
+
+  <rule id="999940" level="8">
+    <category>syslog</category>
+    <decoded_as>qa_dispatch_syslog</decoded_as>
+    <match>^CATEGORY_DISPATCH_SYSLOG$</match>
+    <description>QA baseline: syslog decoder and category agree.</description>
+  </rule>
+
+  <rule id="999941" level="8">
+    <category>firewall</category>
+    <decoded_as>qa_dispatch_firewall</decoded_as>
+    <match>^CATEGORY_DISPATCH_FIREWALL$</match>
+    <description>QA baseline: firewall decoder and category agree.</description>
+  </rule>
+
+  <rule id="999942" level="8">
+    <category>ids</category>
+    <decoded_as>qa_dispatch_ids</decoded_as>
+    <match>^CATEGORY_DISPATCH_IDS</match>
+    <description>QA baseline: IDS category selects its rule tree.</description>
+  </rule>
+
+  <!-- Deliberately higher severity and earlier category root than 999942. -->
+  <!-- Its decoded_as matches the IDS decoder, but its category must exclude it. -->
+  <rule id="999943" level="15">
+    <category>syslog</category>
+    <decoded_as>qa_dispatch_ids</decoded_as>
+    <match>^CATEGORY_DISPATCH_IDS$</match>
+    <description>QA baseline: cross-category decoy must not match.</description>
+  </rule>
+
+  <!-- Legacy defect: decoder_info is set by program_name before regex fails. -->
+  <rule id="999944" level="7">
+    <category>syslog</category>
+    <decoded_as>qa_dispatch_partial</decoded_as>
+    <match>^CATEGORY_DISPATCH_REJECTED$</match>
+    <description>QA baseline: failed regex retains candidate decoder.</description>
+  </rule>
+
+  <rule id="999945" level="7">
+    <category>syslog</category>
+    <decoded_as>qa_dispatch_partial</decoded_as>
+    <match>^PARSED 123$</match>
+    <id>^123$</id>
+    <description>QA baseline: successful regex extracts event ID.</description>
+  </rule>
+
+  <!-- Undecoded input currently enters the default SYSLOG rule tree. -->
+  <rule id="999946" level="7">
+    <category>syslog</category>
+    <match>^CATEGORY_DISPATCH_UNDECODED$</match>
+    <description>QA baseline: undecoded event uses syslog category.</description>
+  </rule>
+
+  <rule id="999947" level="11">
+    <if_sid>999942</if_sid>
+    <match>^CATEGORY_DISPATCH_IDS_CHILD$</match>
+    <description>QA baseline: decoder-gated root reaches dependent rule.</description>
+  </rule>
+
+  <!-- No category means SYSLOG in 4.14.10; this default must be removed. -->
+  <rule id="999948" level="7">
+    <decoded_as>qa_dispatch_syslog</decoded_as>
+    <match>^CATEGORY_DISPATCH_IMPLICIT$</match>
+    <description>QA baseline: implicit syslog category default.</description>
+  </rule>
+
+</group>
