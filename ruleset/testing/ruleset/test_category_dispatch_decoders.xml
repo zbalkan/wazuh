@@ -21,6 +21,7 @@
 <decoder name="qa_dispatch_partial">
   <type>syslog</type>
   <program_name>^qa_dispatch_partial$</program_name>
-  <regex>^PARSED ([0-9]+)$</regex>
+  <!-- The default OSRegex engine uses backslash-d, not [0-9] classes. -->
+  <regex>^PARSED (\d+)$</regex>
   <order>id</order>
 </decoder>

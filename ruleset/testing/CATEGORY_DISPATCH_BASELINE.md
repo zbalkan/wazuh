@@ -15,7 +15,7 @@ The upstream integration workflow runs `runtests.py` against all non-GeoIP `.ini
 | Case | Legacy expectation | Future treatment |
 | --- | --- | --- |
 | Recognized syslog decoder | Syslog-category root is eligible | Decoder-specific dispatch |
-| Recognized firewall decoder | Firewall-category root is eligible | Decoder-specific dispatch; separate firewall output policy |
+| Recognized firewall decoder | Built-in firewall root 4100 reaches the decoder-specific child rule 999941 | Decoder-specific dispatch; separate firewall output policy |
 | Recognized IDS decoder | IDS-category root is eligible | Decoder-specific dispatch |
 | Cross-category decoy | Not eligible, even if `decoded_as` matches | Revisit during ruleset migration |
 | `if_sid` descendant | Inherits the parent's IDS category and is reachable through the matching parent root | Preserve rule ancestry |
@@ -24,6 +24,8 @@ The upstream integration workflow runs `runtests.py` against all non-GeoIP `.ini
 | Failed decoder regex after program-name match | Candidate decoder remains assigned | **Known defect:** must change in recognition-contract PR |
 
 The cross-category decoy (rule 999943) intentionally uses `decoded_as=qa_dispatch_ids` with `category=syslog`. Its higher severity and earlier syslog root expose unsafe removal of category gating. A negative `-U` case verifies the decoy does not become the selected rule, while a separate positive case verifies the expected IDS rule.
+
+Firewall rule 999941 is attached to built-in firewall rule 4100 through `<if_sid>4100</if_sid>`. As the existing category root returns level 0 when no child matches, a standalone firewall rule can be bypassed. The fixture deliberately exercises the real rule hierarchy. Decoder `qa_dispatch_partial` uses `(\\d+)` for digit capture under Wazuh's default OSRegex engine; `[0-9]+` is not an OSRegex character class and did not extract the ID.
 
 The dependent-child case (rule 999947) intentionally omits `<category>`: `rules_list.c` copies its parent rule 999942's IDS category when resolving `<if_sid>`. This is distinct from a standalone rule with an implicit SYSLOG default (999948).
 

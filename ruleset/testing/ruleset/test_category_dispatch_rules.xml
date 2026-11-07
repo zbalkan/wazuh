@@ -9,7 +9,9 @@
     <description>QA baseline: syslog decoder and category agree.</description>
   </rule>
 
+  <!-- Built-in firewall rule 4100 is the category root; attach below it. -->
   <rule id="999941" level="8">
+    <if_sid>4100</if_sid>
     <category>firewall</category>
     <decoded_as>qa_dispatch_firewall</decoded_as>
     <match>^CATEGORY_DISPATCH_FIREWALL$</match>
