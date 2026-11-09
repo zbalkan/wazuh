@@ -10,13 +10,13 @@ Build and install the pinned Wazuh 4.14.12 manager, then run from `ruleset/testi
 
 `sudo python3 runtests.py --path /var/ossec --testfile a01_category.ini --skip-windows-eventchannel`
 
-The existing `4_testintegration_ruleset.yml` runs the full ruleset integration suite on pull requests. Its AWS compilation cache is upstream-only; forks use a direct build.
+The existing `4_testintegration_ruleset.yml` runs the default non-GeoIP ruleset integration tests on pull requests. GeoIP cases require `--geoip` and appropriate GeoIP support. Its AWS compilation cache is upstream-only; forks use a direct build.
 
 ## Fixtures
 
 - `ruleset/test_a01_category_decoders.xml`: three fixed `program_name` decoders with syslog, IDS and firewall types.
 - `ruleset/test_a01_category_rules.xml`: twelve custom rule definitions; all rule IDs are within the six-digit range.
-- `tests/a01_category.ini`: twelve single-event `wazuh-logtest -U` assertions.
+- `tests/a01_category.ini`: thirteen single-event `wazuh-logtest -U` assertions.
 
 The INI runner starts a separate logtest process for every log input. Therefore **no INI assertion here validates multi-event history**, frequency tracking or mutable state across separate events.
 
@@ -30,14 +30,14 @@ The INI runner starts a separate logtest process for every log input. Therefore 
 | 999955 | Child of IDS rule inherits category | Match path inferred from selected child |
 | 999956 | Firewall category rule under built-in rule 4100 | Event lacks production firewall fields; **not** a production firewall test |
 | 999957–999959 | Noalert parent returns NULL when child fails; returns child when it matches | Does not inspect internal state counters |
-| 999960 | Level-zero child prevents the parent from being selected | Negative triple does not prove exact suppression mechanism |
+| 999960 | Positive level-zero selection and negative parent-selection assertions | These establish matching precedence, not independently the absence of generated alerts |
 | 999961 | One `if_sid` rule reachable beneath two different parents | Does not compare every physical RuleNode placement |
 
 All expected output is anchored to the original 4.14.12 behavior. If a test differs in CI, characterize the observed result before deciding whether a fixture or implementation change is justified.
 
 ## Further A-01 acceptance work
 
-The following are **not yet proved** by the twelve INI assertions:
+The following are **not yet proved** by the thirteen INI assertions:
 
 1. Loaded-tree snapshot with ordered node placements and priority/accuracy encoding.
 2. Rule-ID parser/attachment boundaries: ID 0, 1, 999999, 1000000, leading zeros, overflow and malformed `if_sid`/`if_matched_sid`.
