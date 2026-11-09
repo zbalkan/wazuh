@@ -29,7 +29,7 @@ The INI runner starts a separate logtest process for every log input. Therefore 
 | 999954 | Higher-priority cross-category decoy does not intercept an IDS event | Negative `-U` only; positive companion is 999953 |
 | 999955 | Child of IDS rule inherits category | Match path inferred from selected child |
 | 999956 | Firewall category rule under built-in rule 4100 | Event lacks production firewall fields; **not** a production firewall test |
-| 999957–999959 | Noalert parent returns NULL when child fails; returns child when it matches | Does not inspect internal state counters |
+| 999957–999959 | `A01_FALLBACK` selects sibling rule 999959; `A01_FALLBACK_CHILD` selects child rule 999958 | The noalert parent returning NULL when no child matches is inferred from these outcomes and the matcher implementation; the tests do not directly inspect return values or counters |
 | 999960 | Positive level-zero selection and negative parent-selection assertions | These establish matching precedence, not independently the absence of generated alerts |
 | 999961 | One `if_sid` rule reachable beneath two different parents | Does not compare every physical RuleNode placement |
 
