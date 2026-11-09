@@ -1,0 +1,15 @@
+<!-- Wazuh 4.14.12 A-01: original category dispatch, unmodified production decoder behavior. -->
+<decoder name="qa_a01_syslog">
+  <type>syslog</type>
+  <program_name>^qa_a01_syslog$</program_name>
+</decoder>
+
+<decoder name="qa_a01_ids">
+  <type>ids</type>
+  <program_name>^qa_a01_ids$</program_name>
+</decoder>
+
+<decoder name="qa_a01_firewall">
+  <type>firewall</type>
+  <program_name>^qa_a01_firewall$</program_name>
+</decoder>
