@@ -31,6 +31,39 @@
 #include "lists_make.h"
 
 
+#ifdef TESTRULE
+/* A-01 test-only graph observation. Never used by the production analysisd binary.
+ * Emit focused, ordered RuleNode edges after the loader and _setlevels finish.
+ * Keep the original rule tree and matcher unchanged.
+ */
+static void a01_dump_rule_edges(const RuleNode *node, int parent, unsigned int depth)
+{
+    unsigned int sibling = 0;
+
+    for (; node != NULL; node = node->next, ++sibling) {
+        const RuleInfo *rule = node->ruleinfo;
+        if (rule == NULL) {
+            continue;
+        }
+
+        if ((parent == 0 && rule->sigid >= 1 && rule->sigid <= 7) ||
+            (rule->sigid >= 999950 && rule->sigid <= 999961)) {
+            printf("A01_RULE_EDGE\t%d\t%u\t%d\t%d\t%d\t%u\n",
+                   parent, sibling, rule->sigid, rule->level,
+                   rule->category, depth);
+        }
+
+        if (node->child != NULL) {
+            if (depth >= 256) {
+                merror("A-01 graph observation exceeded maximum depth");
+                continue;
+            }
+            a01_dump_rule_edges(node->child, rule->sigid, depth + 1);
+        }
+    }
+}
+#endif
+
 /** Internal Functions **/
 void OS_ReadMSG(char *ut_str);
 
@@ -479,6 +512,11 @@ int main(int argc, char **argv)
     }
 
     if (test_config == 1) {
+#ifdef TESTRULE
+        if (getenv("WAZUH_A01_GRAPH_SNAPSHOT") != NULL) {
+            a01_dump_rule_edges(OS_GetFirstRule(), 0, 0);
+        }
+#endif
         exit(0);
     }
 
