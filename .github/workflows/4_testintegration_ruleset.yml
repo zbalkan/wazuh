@@ -89,6 +89,15 @@ jobs:
           python -m pip install defusedxml==0.7.1
           cd ruleset/testing
           sudo "$(command -v python)" runtests.py --path /var/ossec
+      - name: Characterize A-01 rule ID boundaries
+        run: sudo "$(command -v python)" ruleset/testing/a01_id_probe.py --home /var/ossec --report "${RUNNER_TEMP}/a01-rule-id-boundaries.json"
+      - name: Upload A-01 rule ID characterization
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a01-rule-id-boundaries
+          path: ${{ runner.temp }}/a01-rule-id-boundaries.json
+          if-no-files-found: ignore
       - name: "Compilation cache statistics"
         if: always()
         run: sccache --show-stats 2>/dev/null | grep -viE "cache location|bucket" || true
