@@ -37,6 +37,7 @@ CASES = [
     ("if_sid_nonnumeric", "if_sid", "xyz"),
     ("if_matched_sid_zero", "if_matched_sid", "0"),
     ("if_matched_sid_missing", "if_matched_sid", "9999999"),
+    ("if_matched_sid_nonnumeric", "if_matched_sid", "xyz"),
 ]
 
 
@@ -61,15 +62,15 @@ def make_rule(name, kind, value):
 
 def extract_diagnostics(output):
     lines = [line.strip() for line in output.splitlines() if INTERESTING.search(line)]
-    # Logging may use timestamps and absolute installed paths. Keep raw details
-    # in the report for interpretation, but limit excessive engine diagnostics.
+    # This is a searchable summary, not the full loader output. Preserve
+    # stdout separately for interpreting acceptance versus skipped rules.
     return lines[-35:]
 
 
 def probe(home, target, binary, name, kind, value, timeout):
-    target.write_text(make_rule(name, kind, value), encoding="utf-8")
-    target.chmod(0o644)
     try:
+        target.write_text(make_rule(name, kind, value), encoding="utf-8")
+        target.chmod(0o644)
         run = subprocess.run(
             [str(binary), "-t"],
             cwd=home,
@@ -86,8 +87,9 @@ def probe(home, target, binary, name, kind, value, timeout):
             "exit_code": run.returncode,
             "loader_outcome": "completed" if run.returncode == 0 else "failed",
             "diagnostics": extract_diagnostics(run.stdout),
+            "stdout": run.stdout,
         }
-    except subprocess.TimeoutExpired as exc:
+    except subprocess.TimeoutExpired:
         return {
             "name": name,
             "selector": kind,
