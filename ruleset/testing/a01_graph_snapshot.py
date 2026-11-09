@@ -35,7 +35,7 @@ def capture(home, source, timeout):
         (source / "test_a01_category_rules.xml", home / "etc" / "rules" / "test_a01_category_rules.xml"),
         (source / "test_a01_category_decoders.xml", home / "etc" / "decoders" / "test_a01_category_decoders.xml"),
     )
-    binary = home / "bin" / "wazuh-logtest"
+    binary = home / "bin" / "wazuh-logtest-legacy"
     if not binary.is_file() or not os.access(binary, os.X_OK):
         raise RuntimeError(f"missing legacy logtest binary: {binary}")
     for src, dst in files:
@@ -45,9 +45,9 @@ def capture(home, source, timeout):
     copied = []
     try:
         for src, dst in files:
+            copied.append(dst)  # Track before copying; partial copy/chmod failure must be cleaned.
             shutil.copyfile(src, dst)
             dst.chmod(0o644)
-            copied.append(dst)
 
         env = os.environ.copy()
         env["WAZUH_A01_GRAPH_SNAPSHOT"] = "1"
@@ -64,7 +64,7 @@ def capture(home, source, timeout):
         )
         if proc.returncode != 0:
             raise RuntimeError(
-                f"logtest -t exited {proc.returncode}:\n{proc.stdout[-5000:]}"
+                f"wazuh-logtest-legacy -t exited {proc.returncode}:\n{proc.stdout[-5000:]}"
             )
         edges = []
         for line in proc.stdout.splitlines():
@@ -72,7 +72,7 @@ def capture(home, source, timeout):
             if match:
                 edges.append({key: int(value) for key, value in match.groupdict().items()})
         if not edges:
-            raise RuntimeError("no A01_RULE_EDGE lines: test-only binary or graph hook missing")
+            raise RuntimeError("no A01_RULE_EDGE lines: legacy TESTRULE binary or graph hook missing")
         return edges
     finally:
         for path in reversed(copied):
