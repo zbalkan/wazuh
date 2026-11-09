@@ -54,6 +54,7 @@ jobs:
           make -C src TARGET=server -j2
       # Install wazuh server for linux.
       - name: Install wazuh server for linux
+        id: wazuh_install
         run: |
           echo 'USER_LANGUAGE="en"' > ./etc/preloaded-vars.conf
           echo "" >> ./etc/preloaded-vars.conf
@@ -90,8 +91,10 @@ jobs:
           cd ruleset/testing
           sudo "$(command -v python)" runtests.py --path /var/ossec
       - name: Characterize A-01 rule ID boundaries
+        if: ${{ always() && steps.wazuh_install.outcome == 'success' }}
         run: sudo "$(command -v python)" ruleset/testing/a01_id_probe.py --home /var/ossec --report "${RUNNER_TEMP}/a01-rule-id-boundaries.json"
       - name: Capture A-01 loaded rule graph
+        if: ${{ always() && steps.wazuh_install.outcome == 'success' }}
         run: sudo "$(command -v python)" ruleset/testing/a01_graph_snapshot.py --home /var/ossec --report "${RUNNER_TEMP}/a01-rule-graph.json"
       - name: Upload A-01 baseline evidence
         if: always()
